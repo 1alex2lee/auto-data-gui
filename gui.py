@@ -1,5 +1,6 @@
 # Copyright Alexander Lee
 
+from msilib.schema import ListView
 from select import select
 import tkinter as tk
 from tkinter import Scrollbar, ttk
@@ -97,7 +98,19 @@ class csv_page(tk.Frame):
 
         self.controller = controller
         tk.Label(self, text = 'Confirm File').pack(expand = True)
-        ttk.Button(self, text = 'Confirm',command = '').pack(expand = True)
+        ttk.Button(self, text = 'Confirm',command = controller.show_frame('select_columns_page')).pack(expand = True)
+
+class select_columns_page(tk.Frame):
+    def __init__(self, parent, controller):
+
+        data = pd.read_csv('temp/data.csv')
+        columns = []
+        for c in data.columns[1:]:
+            columns.append(str(c))
+
+        columns_var = tk.StringVar(value = columns)
+
+        tk.listbox(self, listvariable = columns_var, heoght = 6, selectmode = 'extended').pack()
 
 
 if __name__ == '__main__':
