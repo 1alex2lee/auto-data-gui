@@ -55,7 +55,7 @@ class select_file_page(tk.Frame):
             controller.show_frame('csv_page')
         
         tk.Label(self, text = 'Select an Excel file').pack(expand = True)
-        ttk.Button(self, text = 'Select File',command = open_file).pack(expand = True)
+        ttk.Button(self, text = 'Select File', command = open_file).pack(expand = True)
 
 class csv_page(tk.Frame):
     def __init__(self, parent, controller):
