@@ -26,7 +26,7 @@ class pages(tk.Tk):
         container.grid_columnconfigure(0, weight = 1)
 
         self.frames = {}
-        for F in (select_file_page, csv_page):
+        for F in (select_file_page, csv_page, select_columns_page):
             page_name = F.__name__
             frame = F(parent = container, controller = self)
             self.frames[page_name] = frame
@@ -40,6 +40,8 @@ class pages(tk.Tk):
 
 class select_file_page(tk.Frame):
     def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         def open_file():
             filename = fd.askopenfilename(
@@ -51,21 +53,19 @@ class select_file_page(tk.Frame):
             path = os.path.join(sys.path[0], 'temp/data.csv')
             file.to_csv(path)
             controller.show_frame('csv_page')
-
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
+        
         tk.Label(self, text = 'Select an Excel file').pack(expand = True)
         ttk.Button(self, text = 'Select File',command = open_file).pack(expand = True)
 
 class csv_page(tk.Frame):
     def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         data = pd.read_csv('temp/data.csv')
         columns = []
         for c in data.columns[1:]:
             columns.append(str(c))
-
-        tk.Frame.__init__(self, parent)
 
         table = tk.Frame()
         table.pack()
@@ -94,23 +94,55 @@ class csv_page(tk.Frame):
             print(tuple(values))
             my_table.insert(parent='',index='end',iid=k,text='', values = values)
 
-        my_table.pack()
+        my_table.pack(expand = True)
 
-        self.controller = controller
         tk.Label(self, text = 'Confirm File').pack(expand = True)
-        ttk.Button(self, text = 'Confirm',command = controller.show_frame('select_columns_page')).pack(expand = True)
+
+        def next_page():
+            controller.show_frame('select_columns_page')
+        ttk.Button(self, text = 'Confirm',command = next_page).pack(expand = True)
 
 class select_columns_page(tk.Frame):
     def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         data = pd.read_csv('temp/data.csv')
         columns = []
         for c in data.columns[1:]:
             columns.append(str(c))
 
-        columns_var = tk.StringVar(value = columns)
+        tk.Label(self, text = 'Confirm Variables and Result').pack(expand = True)
 
-        tk.listbox(self, listvariable = columns_var, heoght = 6, selectmode = 'extended').pack()
+        # columns_var = tk.StringVar(value = columns)
+
+        tk.Label(self, text = 'Variables').pack(expand = True, side='top', anchor='w')
+
+        self.vars = []
+        for c in columns:
+            var = tk.StringVar(value=c)
+            self.vars.append(var)
+            cb = tk.Checkbutton(self, var=var, text=c,
+                                onvalue=c, offvalue="",
+                                anchor="w", width=20, 
+                                relief="flat", highlightthickness=0)
+            cb.pack(side="top", fill="x", anchor="w", expand=True)
+
+        tk.Label(self, text = 'Results').pack(expand = True, side='top', anchor='e')
+
+        self.vars = []
+        for c in columns:
+            var = tk.StringVar(value=c)
+            self.vars.append(var)
+            cb = tk.Checkbutton(self, var=var, text=c,
+                                onvalue=c, offvalue="",
+                                anchor="w", width=20, 
+                                relief="flat", highlightthickness=0)
+            cb.pack(side="top", fill="x", anchor='e', expand=True)
+
+        def next_page():
+            controller.show_frame('select_columns_page')
+        ttk.Button(self, text = 'Confirm',command = next_page).pack(expand = True)
 
 
 if __name__ == '__main__':
