@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, Scrollbar, ttk
 import pandas as pd
-import sys, os, graphs, thresholds
+import sys, os, graphs
 
 from pyparsing import col
 
