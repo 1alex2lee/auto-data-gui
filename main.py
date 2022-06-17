@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, Scrollbar, ttk
 import pandas as pd
-import sys, os
+import sys, os, graphs, thresholds
 
 from pyparsing import col
 
@@ -111,7 +111,7 @@ def save():
     df_x.to_csv('temp/data_x.csv')
     df_y.to_csv('temp/data_y.csv')
 
-    exec(open('graphs.py').read())
+    graphs.show_graphs()
 
 next_b = Button(confrim_f, text='Next', command=save)
 next_b.grid(row=0, column=1, rowspan=2, sticky=W)
