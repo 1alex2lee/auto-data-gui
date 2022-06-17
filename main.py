@@ -89,13 +89,31 @@ def preview():
 
     preview_l.destroy()
     preview_l = Label(confrim_f, text=vars_preview+'\n'+rest_preview, padx=5, pady=5)
-    preview_l.grid(row=1, column=0, sticky=E)
+    preview_l.grid(row=1, column=0, sticky=W)
 
 
 confirm_b = Button(confrim_f, text='Confirm variables and results', command=preview)
-confirm_b.grid(row=0, column=0, sticky=E)
+confirm_b.grid(row=0, column=0, sticky=W)
 
-next_b = Button(confrim_f, text='Next', command=next)
+def save():
+    global columns, selected_vars, selected_rest, preview_l
+
+    df_x = pd.read_csv('temp/data.csv', index_col=0)
+    df_x = pd.DataFrame(df_x)
+    df_y = df_x
+
+    for c in columns:
+        if selected_vars[c].get() != 1:
+            df_x = df_x.drop(columns=c)
+        if selected_rest[c].get() != 1:
+            df_y = df_y.drop(columns=c)
+
+    df_x.to_csv('temp/data_x.csv')
+    df_y.to_csv('temp/data_y.csv')
+
+    exec(open('graphs.py').read())
+
+next_b = Button(confrim_f, text='Next', command=save)
 next_b.grid(row=0, column=1, rowspan=2, sticky=W)
 
 
