@@ -1,26 +1,36 @@
 from tkinter import *
-from tkinter import filedialog, Scrollbar, ttk
+from tkinter import filedialog, Scrollbar, messagebox
 import pandas as pd
-import sys, os, graphs
-
-from pyparsing import col
+import graphs, thresholds, logreg, os, os.path, errno
 
 root = Tk()
 root.title('Auto Data Analyser')
 
+
+
+## OPEN FIL FRAME
 open_file_f = LabelFrame(root, text='Select file', padx=5, pady=5)
-open_file_f.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
+open_file_f.grid(row=0, column=0, padx=5, pady=5, columnspan=3)
 
 columns = []
 
 def select_file():
-    global columns, select_file_l
+    global columns, select_file_l, path
 
     root.filename = filedialog.askopenfilename(initialdir='/Documents', 
         title='Select Excel File', filetypes = [('Excel files', '.xlsx .xls')])
     csv = pd.read_excel(root.filename)
-    path = os.path.join(sys.path[0], 'temp/data.csv')
-    csv.to_csv(path)
+    # path = os.path.join(sys.path[0], 'temp/data.csv')
+    
+    path = 'temp/'
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+
+    csv.to_csv('temp/data.csv')
 
     select_file_l = Label(open_file_f, text=str(root.filename)+' selected', padx=5, pady =5)
     select_file_l.grid(row=1, column=0)
@@ -38,11 +48,14 @@ select_file_l = Label(open_file_f, text='No file selected', padx=5, pady =5)
 select_file_l.grid(row=1, column=0)
 
 
+
+
+## SELECT VARS AND RESULT FRAME
 select_vars_f = LabelFrame(root, text='Select variables', padx=5, pady=5)
-select_vars_f.grid(row=1, column=0, padx=10, pady=10)
+select_vars_f.grid(row=1, column=0, padx=5, pady=5)
 
 select_rest_f = LabelFrame(root, text='Select result', padx=5, pady=5)
-select_rest_f.grid(row=1, column=1, padx=10, pady=10)
+select_rest_f.grid(row=1, column=1, padx=5, pady=5)
 
 selected_vars = {}
 selected_rest = {}
@@ -68,51 +81,117 @@ def refresh_checkboxes():
         res_checkbutton.pack()
 
 
-confrim_f = Frame(root, padx=5, pady=5)
-confrim_f.grid(row=2, column=0, columnspan=2)
 
-preview_l = Label(confrim_f, text='No variables and result selected', padx=5, pady=5)
-preview_l.grid(row=1, column=0, sticky=E)
 
-def preview():
-    global columns, selected_vars, selected_rest, preview_l
+## CONFIRM VARS AND RESULT FRAME
+# confrim_f = LabelFrame(root, padx=5, pady=5)
+# confrim_f.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-    vars_preview = 'Varibles selected: '
-    rest_preview = 'Result selected: '
+# preview_l = Label(confrim_f, text='No variables and result selected', padx=5, pady=5)
+# preview_l.grid(row=1, column=0, sticky=E)
 
-    for c in columns:
-        if selected_vars[c].get() == 1:
-            vars_preview += str(c) + '; '
-        if selected_rest.get() == c:
-            rest_preview += str(c) + '.'
+# def preview():
+#     global columns, selected_vars, selected_rest, preview_l
 
-    preview_l.destroy()
-    preview_l = Label(confrim_f, text=vars_preview+'\n'+rest_preview, padx=5, pady=5)
-    preview_l.grid(row=1, column=0, sticky=W)
+#     vars_empty = True
+#     rest_empty = True
 
-confirm_b = Button(confrim_f, text='Confirm variables and result', command=preview)
-confirm_b.grid(row=0, column=0, sticky=W)
+#     vars_preview = 'Varibles selected: '
+#     rest_preview = 'Result selected: '
+
+#     for c in columns:
+#         if selected_vars[c].get() == 1:
+#             vars_preview += str(c) + '; '
+#             vars_empty = False
+#         if selected_rest.get() == c:
+#             rest_preview += str(c) + '.'
+#             rest_empty = False
+
+#     preview_l.destroy()
+
+#     if vars_empty:
+#         if rest_empty:
+#             preview_l = Label(confrim_f, text='No variables and result selected', padx=5, pady=5)
+#         else:
+#             preview_l = Label(confrim_f, text='No variables selected.'+'\n'+rest_preview, padx=5, pady=5)
+#     else:
+#         if rest_empty:
+#             preview_l = Label(confrim_f, text=vars_preview+'\n'+'No result selected.', padx=5, pady=5)
+#         else:
+#             preview_l = Label(confrim_f, text=vars_preview+'\n'+rest_preview, padx=5, pady=5)
+
+#     preview_l.grid(row=1, column=0, sticky=W)
+
+# confirm_b = Button(confrim_f, text='Confirm variables and result', command=preview)
+# confirm_b.grid(row=0, column=0)
+
+
+
+
+## NEXT STEPS FRAME
+next_f = LabelFrame(root, padx=5, pady=5)
+next_f.grid(row=1, column=2, rowspan=2, padx=5, pady=5)
 
 def save():
     global columns, selected_vars, selected_rest, preview_l
 
-    df_x = pd.read_csv('temp/data.csv', index_col=0)
+    try:
+        df_x = pd.read_csv('temp/data.csv', index_col=0)
+    except:
+        messagebox.showerror('Error', 'No file selected!')
+
     df_x = pd.DataFrame(df_x)
     df_y = df_x
+
+    vars_empty = True
+    rest_empty = True
 
     for c in columns:
         if selected_vars[c].get() != 1:
             df_x = df_x.drop(columns=c)
+        else:
+            vars_empty = False
         if selected_rest.get() != c:
             df_y = df_y.drop(columns=c)
+        else:
+            rest_empty = False
 
-    df_x.to_csv('temp/data_x.csv')
-    df_y.to_csv('temp/data_y.csv')
+    if vars_empty:
+        if rest_empty:
+            messagebox.showerror('Error', 'No variables and result selected')
+            return False
+        else:
+            messagebox.showerror('Error', 'No variables selected.')
+            return False
+    else:
+        if rest_empty:
+            messagebox.showerror('Error', 'No result selected.')
+            return False
+        else:
+            df_x.to_csv('temp/data_x.csv')
+            df_y.to_csv('temp/data_y.csv')
+            return True
 
-    graphs.show_graphs()
+def show_graphs():
+    if save():
+        graphs.show()
 
-next_b = Button(confrim_f, text='Next', command=save)
-next_b.grid(row=0, column=1, rowspan=2, sticky=W)
+next_b = Button(next_f, text='Show graphs', command=show_graphs)
+next_b.grid(row=0, column=0)
+
+def show_thresholds():
+    if save():
+        thresholds.show()
+
+next_b = Button(next_f, text='Show thresholds', command=show_thresholds)
+next_b.grid(row=1, column=0)
+
+def show_logreg():
+    if save():
+        logreg.show()
+
+next_b = Button(next_f, text='Show logreg', command=show_logreg)
+next_b.grid(row=2, column=0)
 
 
 

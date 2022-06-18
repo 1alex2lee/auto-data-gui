@@ -1,0 +1,1 @@
+pyinstaller --hidden-import="sklearn.utils._typedefs" --hidden-import="sklearn.utils._heap" --hidden-import="sklearn.utils._sorting" --hidden-import="sklearn.utils._vector_sentinel" --onefile -w main.py
