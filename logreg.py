@@ -1,0 +1,31 @@
+from tkinter import *
+import pandas as pd
+import frames, ModelSummary
+from sklearn.linear_model import LogisticRegression as logreg
+from sklearn.metrics import accuracy_score
+
+root = Tk()
+root.title('Logistic Regression')
+
+frame = frames.ScrollableFrame(root)
+
+df = pd.read_csv('temp/data_y_bin.csv', index_col=0)
+y_col = df.columns[-2]
+x = df.drop(columns=['y_bin','index',y_col])
+y = df['y_bin']
+# print(x)
+# print(y)
+
+for x_col in x.columns:
+    X = x[x_col].values.reshape(-1,1)
+    Y = y.values.reshape(-1,1)
+    # print(X)
+    # print(Y)
+
+    mylr = logreg()
+    mylr.fit(X, Y)
+
+    print('Accuracy of '+x_col+' on '+y_col+' is '+str(accuracy_score(Y,  mylr.predict(X))))
+
+    # model_summary = ModelSummary.ModelSummary(mylr, X, Y)
+    # model_summary.get_summary()

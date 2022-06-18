@@ -54,17 +54,16 @@ def refresh_checkboxes():
         widgets.destroy()
 
     selected_vars = {}
-    selected_rest = {}
+    selected_rest = StringVar()
 
     for c in columns:
         selected_vars[c] = IntVar()
-        selected_rest[c] = IntVar()
 
         var_checkbutton = Checkbutton(select_vars_f, text=c, variable=selected_vars[c], onvalue=1, offvalue=0)
         var_checkbutton.deselect()
         var_checkbutton.pack()
 
-        res_checkbutton = Checkbutton(select_rest_f, text=c, variable=selected_rest[c], onvalue=1, offvalue=0)
+        res_checkbutton = Checkbutton(select_rest_f, text=c, variable=selected_rest, onvalue=c)
         res_checkbutton.deselect()
         res_checkbutton.pack()
 
@@ -72,27 +71,26 @@ def refresh_checkboxes():
 confrim_f = Frame(root, padx=5, pady=5)
 confrim_f.grid(row=2, column=0, columnspan=2)
 
-preview_l = Label(confrim_f, text='No variables and results selected', padx=5, pady=5)
+preview_l = Label(confrim_f, text='No variables and result selected', padx=5, pady=5)
 preview_l.grid(row=1, column=0, sticky=E)
 
 def preview():
     global columns, selected_vars, selected_rest, preview_l
 
     vars_preview = 'Varibles selected: '
-    rest_preview = 'Results selected: '
+    rest_preview = 'Result selected: '
 
     for c in columns:
         if selected_vars[c].get() == 1:
             vars_preview += str(c) + '; '
-        if selected_rest[c].get() == 1:
-            rest_preview += str(c) + '; '
+        if selected_rest.get() == c:
+            rest_preview += str(c) + '.'
 
     preview_l.destroy()
     preview_l = Label(confrim_f, text=vars_preview+'\n'+rest_preview, padx=5, pady=5)
     preview_l.grid(row=1, column=0, sticky=W)
 
-
-confirm_b = Button(confrim_f, text='Confirm variables and results', command=preview)
+confirm_b = Button(confrim_f, text='Confirm variables and result', command=preview)
 confirm_b.grid(row=0, column=0, sticky=W)
 
 def save():
@@ -105,7 +103,7 @@ def save():
     for c in columns:
         if selected_vars[c].get() != 1:
             df_x = df_x.drop(columns=c)
-        if selected_rest[c].get() != 1:
+        if selected_rest.get() != c:
             df_y = df_y.drop(columns=c)
 
     df_x.to_csv('temp/data_x.csv')
