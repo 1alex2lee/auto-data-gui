@@ -27,5 +27,12 @@ for x_col in x.columns:
 
     print('Accuracy of '+x_col+' on '+y_col+' is '+str(accuracy_score(Y,  mylr.predict(X))))
 
+    Label(frame.scrollable_frame, text='Accuracy of '+x_col+' on '+y_col+' is '+str(round(accuracy_score(Y,  mylr.predict(X)), 2))).pack()
+
     # model_summary = ModelSummary.ModelSummary(mylr, X, Y)
     # model_summary.get_summary()
+
+
+frame.pack()
+
+root.mainloop()
