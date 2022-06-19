@@ -1,2 +1,4 @@
 dist/main.exe
 dist/
+__pycache__/
+build/
