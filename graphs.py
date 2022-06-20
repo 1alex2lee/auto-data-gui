@@ -2,9 +2,11 @@ from tkinter import *
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import frames
+import frames, clean
 
 def show():
+
+    clean.up()
 
     root = Tk()
     root.title('Graphs')

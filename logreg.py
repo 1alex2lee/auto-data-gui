@@ -1,10 +1,12 @@
 from tkinter import *
 import pandas as pd
-import frames, y_bin
+import frames, y_bin, clean
 from sklearn.linear_model import LogisticRegression as logreg
 from sklearn.metrics import accuracy_score
 
 def show():
+
+    clean.up()
 
     root = Tk()
     root.title('Logistic Regression')

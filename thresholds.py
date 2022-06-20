@@ -2,9 +2,11 @@ from tkinter import *
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import math, frames, y_bin
+import math, frames, y_bin, clean
 
 def show():
+
+    clean.up()
 
     root = Tk()
     root.title('Thresholds')
