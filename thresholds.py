@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import math, frames, y_bin, clean
 
-def show():
+def show(x, y):
 
-    clean.up()
+    # clean.up()
 
     root = Tk()
     root.title('Thresholds')
@@ -17,10 +17,10 @@ def show():
         text="The result is split into high and low categories, denoted with 1 or 0.\nThe split is done with its median.\nEach variable's value is shown for the high or low result."
         ).pack()
 
-    x = pd.read_csv('temp/data_x.csv', index_col=0)
-    y = pd.read_csv('temp/data_y.csv', index_col=0)
+    # x = pd.read_csv('temp/data_x.csv', index_col=0)
+    # y = pd.read_csv('temp/data_y.csv', index_col=0)
 
-    y_bin.bin_it()
+    # y_bin.bin_it()
 
     for y_col in y.columns:
         df_y = pd.DataFrame()
@@ -49,10 +49,11 @@ def show():
             ax.set_title('Threshold of '+x_col+' on '+y_col, fontsize=10)
             ax.set_xlabel(x_col, fontsize=10)
             ax.set_ylabel(y_col+' (1=high, 2=low)', fontsize=10)
+            print(df)
             df.plot.scatter(x=x_col, y='y_bin', ax=ax, legend=False)
             
     frame.pack()
 
     root.mainloop()
 
-# show_thresholds()
+# show()

@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import frames, clean
 
-def show():
+def show(x, y):
 
-    clean.up()
+    # clean.up()
 
     root = Tk()
     root.title('Graphs')
@@ -15,11 +15,11 @@ def show():
 
     Label(root, text="The below graph show each variable's relationship with the result.").pack()
     
-    try:
-        x = pd.read_csv('temp/data_x.csv', index_col=0)
-        y = pd.read_csv('temp/data_y.csv', index_col=0)
-    except:
-        return
+    # try:
+    #     x = pd.read_csv('temp/data_x.csv', index_col=0)
+    #     y = pd.read_csv('temp/data_y.csv', index_col=0)
+    # except:
+    #     return
 
     for y_col in y.columns:
         figure = plt.Figure(figsize=(5,5), dpi=80)

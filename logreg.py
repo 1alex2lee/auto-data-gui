@@ -4,9 +4,9 @@ import frames, y_bin, clean
 from sklearn.linear_model import LogisticRegression as logreg
 from sklearn.metrics import accuracy_score
 
-def show():
+def show(x, y):
 
-    clean.up()
+    # clean.up()
 
     root = Tk()
     root.title('Logistic Regression')
@@ -17,9 +17,9 @@ def show():
         text="Each variable is fitted to a Logsitics Regression model to predict the result.\nTheir accuracies are shown."
         ).pack()
 
-    y_bin.bin_it()
+    df = y_bin.bin_it(x, y)
 
-    df = pd.read_csv('temp/data_y_bin.csv', index_col=0)
+    # df = pd.read_csv('temp/data_y_bin.csv', index_col=0)
     y_col = df.columns[-2]
     x = df.drop(columns=['y_bin','index',y_col])
     y = df['y_bin']

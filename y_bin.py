@@ -1,10 +1,10 @@
 from tkinter import *
 import pandas as pd
 
-def bin_it():
+def bin_it(x, y):
 
-    x = pd.read_csv('temp/data_x.csv', index_col=0)
-    y = pd.read_csv('temp/data_y.csv', index_col=0)
+    # x = pd.read_csv('temp/data_x.csv', index_col=0)
+    # y = pd.read_csv('temp/data_y.csv', index_col=0)
 
     df = pd.DataFrame()
     for x_col in x.columns:
@@ -19,4 +19,6 @@ def bin_it():
             df.at[i,'y_bin'] = 1
     # print(df)
     # df = df.drop(columns=y.columns[0])
-    df.to_csv('temp/data_y_bin.csv')
+    # df.to_csv('temp/data_y_bin.csv')
+
+    return df

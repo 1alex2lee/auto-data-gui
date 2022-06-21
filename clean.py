@@ -29,18 +29,20 @@ def up():
                     for v in values:
                         # print(type(v))
                         if type(v) == int or type(v) == float or type(v) == np.int64:
-                            print(str(v)+' is a number')
+                            # print(str(v)+' is a number')
+                            pass
                         else:
                             if v.lower() == 'yes':
                                 x[x_col+'_bin'] = True.astype(float)
                             elif v.lower() == 'no':
                                 x[x_col+'_bin'] = False.astype(float)
                             else:
-                                x[x_col+'_'+v] = x[x_col] == v
+                                x[x_col+'_'+v] = (x[x_col] == v).astype(float)
                                 # print(v+' is not a number')
             x = x.drop(columns=x_col)
         except:
-            print(x_col+' is not a string column')
+            # print(x_col+' is not a string column')
+            pass
         
 
 
@@ -70,19 +72,23 @@ def up():
                             elif v.lower() == 'no':
                                 y[y_col+'_bin'] = False.astype(float)
                             else:
-                                y[y_col+'_'+v] = y[y_col] == v
+                                y[y_col+'_'+v] = (y[y_col] == v).astype(float)
                                 # print(v+' is not a number')
             y = y.drop(columns=y_col)
         except:
-            print(y_col+' is not a string column')
+            # print(y_col+' is not a string column')
+            pass
         
 
 
-    print(x)
-    print(y)
+    # print(x)
+    # print(y)
 
 
-    x.to_csv('temp/data_x.csv')
-    y.to_csv('temp/data_y.csv')
+    # x.to_csv('temp/data_x.csv')
+    # y.to_csv('temp/data_y.csv')
+
+
+    return x, y
 
 
