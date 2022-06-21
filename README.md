@@ -9,3 +9,6 @@ A graphical user interface allows the user to open an Excel spreadsheet in a par
 
 # What is the Excel spreadsheet format?
 A spreadsheet containing one table, with the first row as the header row, and each subsequent row being an entry of data. No index columns.
+
+# How do I use it?
+Like, don't.
