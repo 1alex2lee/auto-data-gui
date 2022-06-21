@@ -66,6 +66,9 @@ def refresh_checkboxes():
     for widgets in select_vars_f.winfo_children():
         widgets.destroy()
 
+    for widgets in select_rest_f.winfo_children():
+        widgets.destroy()
+
     selected_vars = {}
     selected_rest = StringVar()
 

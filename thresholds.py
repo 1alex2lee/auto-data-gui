@@ -31,17 +31,29 @@ def show(x, y):
 
         for x_col in x.columns:
             df = pd.DataFrame()
-            df[x_col] = x[x_col]
+            df['x'] = x[x_col]
             df[y_col] = y[y_col]   
             df.sort_values(y_col, inplace=True)
             df = df.reset_index()
 
-            for i in range(df.shape[0]):
-                if i < df.shape[0]/2:
-                    df.at[i,'y_bin'] = 0
-                else:
-                    df.at[i,'y_bin'] = 1
-                    
+            # for i in range(df.shape[0]):
+            #     if i < df.shape[0]/2:
+            #         df.at[i,'y_bin'] = 0
+            #     else:
+            #         df.at[i,'y_bin'] = 1
+
+            values = df[y_col].unique()
+
+            if len(values) > 2:
+                for i in range(df.shape[0]):
+                    if i < df.shape[0]/2:
+                        df.at[i,'y'] = 0
+                    else:
+                        df.at[i,'y'] = 1
+            else:
+                df['y'] = df[y_col]
+
+
             figure = plt.Figure(figsize=(4,4), dpi=90)
             ax = figure.add_subplot(111)
             chart_type = FigureCanvasTkAgg(figure, frame.scrollable_frame)
@@ -49,8 +61,8 @@ def show(x, y):
             ax.set_title('Threshold of '+x_col+' on '+y_col, fontsize=10)
             ax.set_xlabel(x_col, fontsize=10)
             ax.set_ylabel(y_col+' (1=high, 2=low)', fontsize=10)
-            print(df)
-            df.plot.scatter(x=x_col, y='y_bin', ax=ax, legend=False)
+            # print(df)
+            df.plot.scatter(x='x', y='y', ax=ax, legend=False)
             
     frame.pack()
 

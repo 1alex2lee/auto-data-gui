@@ -32,12 +32,12 @@ def up():
                             # print(str(v)+' is a number')
                             pass
                         else:
-                            if v.lower() == 'yes':
-                                x[x_col+'_bin'] = True.astype(float)
-                            elif v.lower() == 'no':
-                                x[x_col+'_bin'] = False.astype(float)
-                            else:
-                                x[x_col+'_'+v] = (x[x_col] == v).astype(float)
+                            # if v.lower() == 'yes':
+                            #     x[x_col+'_bin'] = True.astype(float)
+                            # elif v.lower() == 'no':
+                            #     x[x_col+'_bin'] = False.astype(float)
+                            # else:
+                            x[x_col+'_'+v] = (x[x_col] == v).astype(float)
                                 # print(v+' is not a number')
             x = x.drop(columns=x_col)
         except:
@@ -67,12 +67,12 @@ def up():
                         if type(v) == int or type(v) == float or type(v) == np.int64:
                             print(str(v)+' is a number')
                         else:
-                            if v.lower() == 'yes':
-                                y[y_col+'_bin'] = True.astype(float)
-                            elif v.lower() == 'no':
-                                y[y_col+'_bin'] = False.astype(float)
-                            else:
-                                y[y_col+'_'+v] = (y[y_col] == v).astype(float)
+                            # if v.lower() == 'yes':
+                            #     y[y_col+'_bin'] = True.astype(float)
+                            # elif v.lower() == 'no':
+                            #     y[y_col+'_bin'] = False.astype(float)
+                            # else:
+                            y[y_col+'_'+v] = (y[y_col] == v).astype(float)
                                 # print(v+' is not a number')
             y = y.drop(columns=y_col)
         except:
@@ -91,4 +91,4 @@ def up():
 
     return x, y
 
-
+# print(up())
