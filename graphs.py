@@ -35,8 +35,9 @@ def show(x, y):
             df.plot(x='x', y='y', ax=ax, label=x_col, xlabel='Variables', ylabel=y_col)
             ax.legend(loc='center right', fontsize=8)
 
-    frame.pack()
+    frame.pack(expand=True)
 
     root.mainloop()
 
-# show()
+# x, y = clean.up()
+# show(x, y)

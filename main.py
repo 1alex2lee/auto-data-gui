@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, Scrollbar, messagebox
 import pandas as pd
-import graphs, thresholds, logreg, os, os.path, errno, clean
+import graphs, thresholds, logreg, os, os.path, errno, clean, decisiontree
 
 root = Tk()
 root.title('Auto Data Analyser')
@@ -199,6 +199,13 @@ def show_logreg():
 next_b = Button(next_f, text='Show logreg', command=show_logreg)
 next_b.grid(row=2, column=0)
 
+def show_decisiontree():
+    if save():
+        x, y = clean.up()
+        decisiontree.show(x, y)
+
+next_b = Button(next_f, text='Show decision tree', command=show_decisiontree)
+next_b.grid(row=3, column=0)
 
 
 root.mainloop()
