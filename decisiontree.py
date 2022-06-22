@@ -1,6 +1,6 @@
 from sklearn import tree
 from sklearn.metrics import accuracy_score
-import graphviz
+import graphviz, clean
 from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox

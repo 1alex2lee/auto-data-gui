@@ -161,7 +161,7 @@ def save():
 
     if vars_empty:
         if rest_empty:
-            messagebox.showerror('Error', 'No variables and result selected')
+            messagebox.showerror('Error', 'No variables and result selected.')
             return False
         else:
             messagebox.showerror('Error', 'No variables selected.')
