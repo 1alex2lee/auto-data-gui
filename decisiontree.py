@@ -4,6 +4,7 @@ import graphviz, clean
 from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox
+from matplotlib import pyplot as plt
 
 
 def show(x, y):
@@ -59,20 +60,29 @@ def show(x, y):
             messagebox.showerror('Error', "Parameters out of range.")
             return
 
-        dot_data = tree.export_graphviz(dt, out_file=None) 
-        graph = graphviz.Source(dot_data) 
+        # dot_data = tree.export_graphviz(dt, out_file=None) 
+        # graph = graphviz.Source(dot_data) 
 
         predictors = x.columns
-        dot_data = tree.export_graphviz(dt, out_file=None,
-                                        feature_names = predictors,
-                                        class_names = ('Negative', 'Positive'),
-                                        filled = True, rounded = True,
-                                        special_characters = True)
-        graph = graphviz.Source(dot_data)  
-        graph
 
-        graph.format = 'png'
-        graph.render('temp/decisiontree')
+        # dot_data = tree.export_graphviz(dt, out_file=None,
+        #                                 feature_names = predictors,
+        #                                 class_names = ('Negative', 'Positive'),
+        #                                 filled = True, rounded = True,
+        #                                 special_characters = True)
+        # graph = graphviz.Source(dot_data)  
+        # graph
+
+        # graph.format = 'png'
+        # graph.render('temp/decisiontree')
+
+
+        fig = plt.figure(figsize=(12,12))
+        _ = tree.plot_tree(dt, 
+                   feature_names=predictors,
+                   class_names=('Negative', 'Positive'),
+                   filled=True)
+        fig.savefig("temp/decisiontree.png")
 
 
         image = Image.open('temp/decisiontree.png')
