@@ -81,7 +81,7 @@ def show(x, y):
         _ = tree.plot_tree(dt, 
                    feature_names=predictors,
                    class_names=('Negative', 'Positive'),
-                   filled=True)
+                   filled=True, rounded=True)
         fig.savefig("temp/decisiontree.png")
 
 
@@ -95,7 +95,21 @@ def show(x, y):
 
     root.bind('<Return>', create_tree)
 
-    Button(root, text='Create Tree', command=create_tree).grid(row=1, column=2, rowspan=2)
+    Button(root, text='Create Tree', command=create_tree).grid(row=1, column=2)
+
+
+    def help():
+        root = Tk()
+        root.title('About Decision Trees')
+
+
+
+
+    Button(root, text='Help', command=help).grid(row=2, column=2)
 
 
     root.mainloop()
+
+
+x, y = clean.up()
+show(x, y)
