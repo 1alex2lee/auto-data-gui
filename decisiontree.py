@@ -102,6 +102,13 @@ def show(x, y):
         root = Tk()
         root.title('About Decision Trees')
 
+        Label(root, text="The decision tree selects a variable and splits the data into 2 groups based on that variable.\n"+
+        "It then splits each group using the same method, until the Gini does not improve more that the min impurity increase, or it has split to max depth.\n\n"+
+        "Gini = prediction accuracy\nSamples = no. of samples in group\nValue = [no. of negative results, no. of positive results] in group\n"+
+        "Class = the predicted result of the model\n\n"+
+        "Compare value and class to see how well each split predicts the samples. Gini defines the prediction accuracy."
+        ).pack(padx=5, pady=5)
+
 
 
 
@@ -111,5 +118,5 @@ def show(x, y):
     root.mainloop()
 
 
-x, y = clean.up()
-show(x, y)
+# x, y = clean.up()
+# show(x, y)
