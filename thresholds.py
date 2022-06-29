@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import math, frames, y_bin, clean
 
-def show(x, y):
+def show(x, y, col_types):
 
     # clean.up()
 
@@ -62,10 +62,11 @@ def show(x, y):
             ax.set_xlabel(x_col, fontsize=10)
             ax.set_ylabel(y_col+' (1=high, 2=low)', fontsize=10)
             # print(df)
-            df.plot.scatter(x='x', y='y', ax=ax, legend=False)
+            df.plot.hexbin(x='x', y='y', ax=ax, legend=False)
             
     frame.pack()
 
     root.mainloop()
 
-# show()
+# x, y = clean.up()
+# show(x, y)

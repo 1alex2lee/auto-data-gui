@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import frames, clean
 
-def show(x, y):
+def show(x, y, col_types):
 
     # clean.up()
 
@@ -25,7 +25,7 @@ def show(x, y):
         figure = plt.Figure(figsize=(5,5), dpi=80)
         ax = figure.add_subplot(111)
         chart_type = FigureCanvasTkAgg(figure, frame.scrollable_frame)
-        chart_type.get_tk_widget().pack()
+        chart_type.get_tk_widget().pack(expand=True, padx=5, pady=5)
         ax.set_title('Variables againast '+y_col, fontsize=10)
         for x_col in x.columns:
             df = pd.DataFrame()
