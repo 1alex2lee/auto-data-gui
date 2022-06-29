@@ -11,4 +11,4 @@ A graphical user interface allows the user to open an Excel spreadsheet in a par
 A spreadsheet containing one table, with the first row as the header row, and each subsequent row being an entry of data. No index columns.
 
 # How do I use it?
-Run main.py or package as onefile for portability. Package command for successful packaging in pyinstaller_command.txt
+Run main.py or package as one file for portability. Package command for successful packaging in pyinstaller_command.txt
