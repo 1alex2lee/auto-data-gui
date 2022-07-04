@@ -177,32 +177,32 @@ def save():
 
 def show_graphs():
     if save():
-        x, y, col_types = clean.up()
-        graphs.show(x , y, col_types)
+        x, y, col_type = clean.up()
+        graphs.show(x , y, col_type)
 
 next_b = Button(next_f, text='Show graphs', command=show_graphs)
 next_b.grid(row=0, column=0)
 
 def show_thresholds():
     if save():
-        x, y, col_types = clean.up()
-        thresholds.show(x, y, col_types)
+        x, y, col_type = clean.up()
+        thresholds.show(x, y, col_type)
 
 next_b = Button(next_f, text='Show thresholds', command=show_thresholds)
 next_b.grid(row=1, column=0)
 
 def show_logreg():
     if save():
-        x, y, col_types = clean.up()
-        logreg.show(x, y, col_types)
+        x, y, col_type = clean.up()
+        logreg.show(x, y, col_type)
 
 next_b = Button(next_f, text='Show logreg', command=show_logreg)
 next_b.grid(row=2, column=0)
 
 def show_decisiontree():
     if save():
-        x, y, col_types = clean.up()
-        decisiontree.show(x, y, col_types)
+        x, y, col_type = clean.up()
+        decisiontree.show(x, y, col_type)
 
 next_b = Button(next_f, text='Show decision tree', command=show_decisiontree)
 next_b.grid(row=3, column=0)

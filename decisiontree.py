@@ -7,7 +7,7 @@ from tkinter import messagebox
 from matplotlib import pyplot as plt
 
 
-def show(x, y, col_types):
+def show(x, y, col_type):
     global max_d, min_i_d
 
     root = Toplevel()

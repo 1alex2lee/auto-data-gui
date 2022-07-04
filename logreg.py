@@ -1,5 +1,5 @@
 from tkinter import *
-import frames, y_bin, clean
+import frames, bin, clean
 from sklearn.linear_model import LogisticRegression as logreg
 from sklearn.metrics import accuracy_score
 
@@ -16,7 +16,7 @@ def show(x, y):
         text="Each variable is fitted to a Logsitics Regression model to predict the result.\nTheir accuracies are shown."
         ).pack()
 
-    df = y_bin.bin_it(x, y)
+    df = bin.it(x, y)
 
     # df = pd.read_csv('temp/data_y_bin.csv', index_col=0)
     y_col = df.columns[-2]

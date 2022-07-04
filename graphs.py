@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import frames, clean
 
-def show(x, y, col_types):
+def show(x, y, col_type):
 
     # clean.up()
 
@@ -23,7 +23,7 @@ def show(x, y, col_types):
 
     for y_col in y.columns:
 
-        if col_types[y_col] == 'continuous' or col_types[y_col] == 'binary':
+        if col_type[y_col] == 'continuous' or col_type[y_col] == 'binary':
 
             figure = plt.Figure(figsize=(5,5), dpi=80)
             ax = figure.add_subplot(111)
@@ -33,7 +33,7 @@ def show(x, y, col_types):
 
             for x_col in x.columns:
 
-                if col_types[x_col] == 'continuous':
+                if col_type[x_col] == 'continuous':
                     
                     df = pd.DataFrame()
                     df['x'] = x[x_col]
@@ -46,5 +46,5 @@ def show(x, y, col_types):
 
     root.mainloop()
 
-# x, y = clean.up()
-# show(x, y)
+# x, y, col_type = clean.up()
+# show(x, y, col_type)
