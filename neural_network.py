@@ -21,6 +21,8 @@ def show(x, y, col_type):
     x_train = tf.convert_to_tensor(x)
     y_train = tf.convert_to_tensor(y)
 
+    print(y_train)
+
     model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=(28, 28)),
     tf.keras.layers.Dense(128, activation='relu'),
