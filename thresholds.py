@@ -2,7 +2,7 @@ from tkinter import *
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import math, frames, bin, clean
+import math, frames, bin, clean, logreg
 
 from sklearn.utils import column_or_1d
 
@@ -111,18 +111,25 @@ def show(x, y, col_type):
                     frame = Frame(root)
 
                     def refresh(v):
+                        # Label(frame, text='y threshold is '+str(y_threshold.get())).grid(row=2, column=0)
                         Label(frame, text='y threshold is '+str(y_threshold.get())).grid(row=2, column=0)
-                        Label(frame, text='x threshold is '+str(x_threshold.get())).grid(row=2, column=1)
+
+                        # x_th = x_threshold.get()
+
+                        Label(frame, text='logreg accuracy is '+str(logreg.accuracy(x[x_col], y[y_col], 
+                            y_threshold.get()))).grid(row=2, column=1)
 
                     # print(y[y_col].min())
 
-                    y_threshold = Scale(frame, from_=y[y_col].max(), to=y[y_col].min(), resolution=(y[y_col].max()-y[y_col].min())/10, orient='vertical', command=refresh, length=350)
-                    y_threshold.grid(row=0, column=0)
-                    x_threshold = Scale(frame, from_=x[x_col].min(), to=x[x_col].max(), resolution=(x[x_col].max()-x[x_col].min())/10, orient='horizontal', command=refresh, length=350)
-                    x_threshold.grid(row=1, column=1)
+                    res = 20
+
+                    y_threshold = Scale(frame, from_=y[y_col].max(), to=y[y_col].min(), resolution=(y[y_col].max()-y[y_col].min())/res, orient='vertical', command=refresh, length=350)
+                    y_threshold.grid(row=0, column=0, padx=5, pady=5)
+                    # x_threshold = Scale(frame, from_=x[x_col].min(), to=x[x_col].max(), resolution=(x[x_col].max()-x[x_col].min())/res, orient='horizontal', command=refresh, length=350)
+                    # x_threshold.grid(row=1, column=1)
 
                     Label(frame, text='y threshold is 0').grid(row=2, column=0)
-                    Label(frame, text='x threshold is 0').grid(row=2, column=1)
+                    Label(frame, text='logreg accuracy is ').grid(row=2, column=1)
 
 
 
@@ -139,7 +146,7 @@ def show(x, y, col_type):
                     ax = figure.add_subplot(111)
                     chart_type = FigureCanvasTkAgg(figure, frame)
                     chart_type.get_tk_widget().grid(row=0, column=1, padx=5, pady=5)
-                    ax.set_title('Threshold of '+x_col+' on '+y_col, fontsize=10)
+                    ax.set_title('Threshold of '+x_col+' on '+y_col, fontsize=10,)
                     # print(df)
                     df.plot.scatter(x=x_col, y=y_col, ax=ax, legend=False)
                     # ax.set_xlabel(x_col, fontsize=10)

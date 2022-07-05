@@ -45,3 +45,24 @@ def show(x, y):
     frame.pack()
 
     root.mainloop()
+
+
+
+def accuracy(x, y, y_threshold):
+    # print(x)
+    # print(y)
+    # print(x_threshold)
+
+    df = bin.threshold(x, y, y_threshold)
+
+    # print(df)
+
+    # print(df.iloc[:,0])
+
+    x = df.iloc[:,0].values.reshape(-1,1)
+    y = df['y_bin'].values.reshape(-1,1)
+
+    mylr = logreg()
+    mylr.fit(x, y)
+
+    return accuracy_score(y,  mylr.predict(x))

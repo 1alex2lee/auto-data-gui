@@ -11,7 +11,7 @@ def it(x, y):
     x_col = x.columns[0]
     y_col = y.columns[0]
 
-    print(x_col)
+    # print(x_col)
 
     df[x_col] = x[x_col]
     df[y_col] = y[y_col]
@@ -27,6 +27,31 @@ def it(x, y):
 
     # print(df)
     # df = df.drop(columns=y.columns[0])
+    # df.to_csv('temp/data_y_bin.csv')
+
+    return df
+
+
+
+def threshold(x, y, y_threshold):
+
+    # x = pd.read_csv('temp/data_x.csv', index_col=0)
+    # y = pd.read_csv('temp/data_y.csv', index_col=0)
+
+    df = pd.DataFrame()
+
+    x_col = x.name
+    y_col = y.name
+
+    # print(x_col)
+
+    df[x_col] = x
+    df[y_col] = y
+
+    df['y_bin'] = (df[y_col] >= y_threshold).astype(int)
+
+    # print(df)
+    df = df.drop(columns=y_col)
     # df.to_csv('temp/data_y_bin.csv')
 
     return df
