@@ -41,7 +41,7 @@ def show(x, y, col_type):
         loss=loss_fn,
         metrics=['accuracy'])
 
-    model.fit(x_train, y_train, epochs=5)
+    model.fit(tf.expand_dims(x_train, axis=-1), y_train, epochs=5)
 
     Label(root, 
         text=str(model.evaluate(x_train, y_train))
