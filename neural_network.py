@@ -1,5 +1,6 @@
 from tkinter import *
 import tensorflow as tf
+import pandas as pd
 import clean
 
 # mnist = tf.keras.datasets.mnist
@@ -17,8 +18,8 @@ def show(x, y, col_type):
         text="A neural network is trained with the selected data and its accuracy shown."
         ).pack()
 
-    x_train = X
-    y_train = y
+    x_train = tf.convert_to_tensor(x)
+    y_train = tf.convert_to_tensor(y)
 
     model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=(28, 28)),
