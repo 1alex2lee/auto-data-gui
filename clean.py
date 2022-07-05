@@ -45,6 +45,7 @@ def up():
         # except:
 
             x[x_col] = x[x_col].str.lower()
+            values = x[x_col].unique()
 
             if 'yes' in values:
                 if 'no' in values:
@@ -106,6 +107,7 @@ def up():
         else:
 
             y[y_col] = y[y_col].str.lower()
+            values = y[y_col].unique()
 
             if 'yes' in values:
                 if 'no' in values:

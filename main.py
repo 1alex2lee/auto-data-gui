@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, Scrollbar, messagebox
 import pandas as pd
-import graphs, thresholds, logreg, os, os.path, errno, clean, decisiontree
+import graphs, thresholds, logreg, os, os.path, errno, clean, decisiontree, neural_network
 
 root = Tk()
 root.title('Auto Data Analyser')
@@ -206,6 +206,14 @@ def show_decisiontree():
 
 next_b = Button(next_f, text='Show decision tree', command=show_decisiontree)
 next_b.grid(row=3, column=0)
+
+def show_neuralnetwork():
+    if save():
+        x, y, col_type = clean.up()
+        neural_network.show(x, y, col_type)
+
+next_b = Button(next_f, text='Show neural network', command=show_neuralnetwork)
+next_b.grid(row=4, column=0)
 
 
 root.mainloop()

@@ -65,4 +65,4 @@ def accuracy(x, y, y_threshold):
     mylr = logreg()
     mylr.fit(x, y)
 
-    return accuracy_score(y,  mylr.predict(x))
+    return round(accuracy_score(y,  mylr.predict(x)), 2)

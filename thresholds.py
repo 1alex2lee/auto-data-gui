@@ -15,10 +15,10 @@ def show(x, y, col_type):
     root = Tk()
     root.title('Thresholds')
 
-    frame = frames.ScrollableFrame(root)
+    frame = Frame(root)
 
     Label(root, 
-        text="The result is split into high and low categories, denoted with 1 or 0.\nThe split is done with its median.\nEach variable's value is shown for the high or low result."
+        text="The y threshold decides which y values are high (1) and which are low (0) in binary.\nThe accuracy of a logistics regression model is then calculated for that threshold."
         ).pack()
 
     # x = pd.read_csv('temp/data_x.csv', index_col=0)
@@ -28,7 +28,7 @@ def show(x, y, col_type):
 
     # print(x)
     # print(y)
-    # print(col_type)
+    print(col_type)
 
     for y_col in y.columns:
 
@@ -48,7 +48,7 @@ def show(x, y, col_type):
 
                     figure = plt.Figure(figsize=(4,4), dpi=90)
                     ax = figure.add_subplot(111)
-                    chart_type = FigureCanvasTkAgg(figure, frame.scrollable_frame)
+                    chart_type = FigureCanvasTkAgg(figure, frame)
                     chart_type.get_tk_widget().pack(padx=5, pady=5)
                     ax.set_title('Threshold of '+x_col+' on '+y_col, fontsize=10)
                     ax.set_xlabel(x_col, fontsize=10)
@@ -108,8 +108,6 @@ def show(x, y, col_type):
 
                 if col_type[x_col] == 'continuous':
 
-                    frame = Frame(root)
-
                     def refresh(v):
                         # Label(frame, text='y threshold is '+str(y_threshold.get())).grid(row=2, column=0)
                         Label(frame, text='y threshold is '+str(y_threshold.get())).grid(row=2, column=0)
@@ -153,9 +151,9 @@ def show(x, y, col_type):
                     # ax.set_ylabel(df.columns[1]+' (0=low, 1=high)', fontsize=10)
 
             
-                    frame.pack()
+    frame.pack(padx=5, pady=5)
 
     root.mainloop()
 
-x, y, col_type = clean.up()
-show(x, y, col_type)
+# x, y, col_type = clean.up()
+# show(x, y, col_type)
