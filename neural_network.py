@@ -1,6 +1,11 @@
 from tkinter import *
 import tensorflow as tf
+from keras.models import Sequential
 import pandas as pd
+from keras.layers import Dense
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import clean
 
 # mnist = tf.keras.datasets.mnist
@@ -18,38 +23,44 @@ def show(x, y, col_type):
         text="A neural network is trained with the selected data and its accuracy shown."
         ).pack()
 
-    x_train = tf.convert_to_tensor(x)
-    y_train = tf.convert_to_tensor(y)
+    # x_train = tf.convert_to_tensor(x)
+    # y_train = tf.convert_to_tensor(y)
 
-    print(y_train)
+    # print(y_train)
 
-    model = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(10)
-    ])
+    print(x)
+    print(y)
 
-    # predictions = model(x_train[:1]).numpy()
-    # # print(predictions)
 
-    # tf.nn.softmax(predictions).numpy()
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
+    
+    scaler = StandardScaler().fit(X_train)
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
 
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
-    # loss_fn(y_train[:1], predictions).numpy()
+    model = Sequential()
+    model.add(Dense(8, activation='relu', input_shape=(1,)))
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',
+    optimizer='sgd',
+    metrics=['accuracy'])
+    model.fit(X_train, y_train,epochs=8, batch_size=1, verbose=1)
 
-    model.compile(optimizer='adam',
-        loss=loss_fn,
-        metrics=['accuracy'])
 
-    model.fit(tf.expand_dims(x_train, axis=-1), y_train, epochs=5)
+    y_pred = model.predict(X_test)
+    score = model.evaluate(X_test, y_test,verbose=1)
+    print(score)
+
+
+
 
     Label(root, 
-        text=str(model.evaluate(x_train, y_train))
+        text=""
         ).pack()
 
-    root.mainloop()
+    # root.mainloop()
 
 
 x, y, col_type = clean.up()
