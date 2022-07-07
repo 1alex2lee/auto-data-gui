@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 from tkinter import messagebox
 import tensorflow as tf
 from keras.models import Sequential
@@ -15,52 +16,73 @@ import clean
 # x_train, x_test = x_train / 255.0, x_test / 255.0
 
 
+def progress(status):
+    if status == 'start':
+        root = Tk()
+        root.geometry('300x120')
+        root.title('Training Progress')
+
+        pb = ttk.Progressbar(
+            root,
+            orient='horizontal',
+            mode='indeterminate',
+            length=280
+        )
+
+        pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
+        pb.start()
+
+        root.mainloop()
+
+    elif status == 'end':
+        pb.stop()
+
+
 def train(x, y, layers, epoch, split):
 
-    try:
-        layers = int(layers)
-        epoch = int(epoch)
-        split = float(split)
-        if layers < 3:
-            messagebox.showerror('Error', "Input incorrect.")
-        if split >= 1 or split <= 0:
-            messagebox.showerror('Error', "Input incorrect.")
-    except:
-        messagebox.showerror('Error', "Input incorrect.")
+    if type(layers) == int and type(epoch) == int and type(split) == float and split < 1 and split > 0:
+
+        try:
+
+            progress('start')            
+
+            X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
+            
+            scaler = StandardScaler().fit(X_train)
+            X_train = scaler.transform(X_train)
+            # X_test = scaler.transform(X_test)
+
+
+            model = Sequential()
+            model.add(Dense(8, activation='relu', input_shape=(1,)))
+
+            for l in range (layers-2):
+                model.add(Dense(8, activation='relu'))
+
+            model.add(Dense(1, activation='sigmoid'))
+            model.compile(loss='binary_crossentropy',
+            optimizer='sgd',
+            metrics=['accuracy'])
+
+            model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
+
+
+            y_pred = model.predict(X_train)
+            score = model.evaluate(X_train, y_train,verbose=2)
+            print(score)
+
+            model.save('temp/')
+
+            progress('end')
+
+
+        except:
+            messagebox.showerror('Error', "Parameters out of range.")
+            return
+
+    else:
+        messagebox.showerror('Error', "Input error.")
         return
-
-    try:
-
-        X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
-        
-        scaler = StandardScaler().fit(X_train)
-        X_train = scaler.transform(X_train)
-        # X_test = scaler.transform(X_test)
-
-
-        model = Sequential()
-        model.add(Dense(8, activation='relu', input_shape=(1,)))
-
-        for l in range (layers-2):
-            model.add(Dense(8, activation='relu'))
-
-        model.add(Dense(1, activation='sigmoid'))
-        model.compile(loss='binary_crossentropy',
-        optimizer='sgd',
-        metrics=['accuracy'])
-        model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
-
-
-        y_pred = model.predict(X_train)
-        score = model.evaluate(X_train, y_train,verbose=2)
-        print(score)
-
-        model.save('temp/')
-
-    except:
-        messagebox.showerror('Error', "Parameters out of range.")
-        return
-
 
 
 def show(x, y, col_type):
@@ -113,4 +135,6 @@ def show(x, y, col_type):
 
 
 x, y, col_type = clean.up()
-show(x, y, col_type)
+# show(x, y, col_type)
+
+train(x, y, 3, 5, 0.01)
