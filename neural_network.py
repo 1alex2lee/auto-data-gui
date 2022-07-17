@@ -8,7 +8,7 @@ from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import clean
+import clean, threading
 
 # mnist = tf.keras.datasets.mnist
 
@@ -16,64 +16,70 @@ import clean
 # x_train, x_test = x_train / 255.0, x_test / 255.0
 
 
-def progress(status):
-    if status == 'start':
-        root = Tk()
-        root.geometry('300x120')
-        root.title('Training Progress')
+def train(x, y, layers, epoch, split, acc):
 
-        pb = ttk.Progressbar(
-            root,
-            orient='horizontal',
-            mode='indeterminate',
-            length=280
-        )
-
-        pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
-        pb.start()
-
-        root.mainloop()
-
-    elif status == 'end':
-        pb.stop()
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
+            
+    scaler = StandardScaler().fit(X_train)
+    X_train = scaler.transform(X_train)
+    # X_test = scaler.transform(X_test)
 
 
-def train(x, y, layers, epoch, split):
+    model = Sequential()
+    model.add(Dense(8, activation='relu', input_shape=(1,)))
+
+    for l in range (layers-2):
+        model.add(Dense(8, activation='relu'))
+
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',
+    optimizer='sgd',
+    metrics=['accuracy'])
+
+    model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
+
+    y_pred = model.predict(X_train)
+    score = model.evaluate(X_train, y_train,verbose=2)
+    print(score)
+
+    model.save('temp/')
+
+    acc.set(score)
+
+
+
+
+
+def model(x, y, layers, epoch, split):
 
     if type(layers) == int and type(epoch) == int and type(split) == float and split < 1 and split > 0:
 
         try:
 
-            progress('start')            
+            root = Tk()
+            # root.geometry('300x120')
+            root.title('Neural Network Model')
 
-            X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
+            pb = ttk.Progressbar(
+                root,
+                orient='horizontal',
+                mode='indeterminate',
+                length=280
+            )
+
+            pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
+            pb.start()
+
+            acc = StringVar()
+            threading.Thread(target=train, args=(x, y, layers, epoch, split, acc)).start()
+            root.wait_variable(acc)
+
+            pb.destroy()
+            root.insert(END, acc.get())
+
+
+
             
-            scaler = StandardScaler().fit(X_train)
-            X_train = scaler.transform(X_train)
-            # X_test = scaler.transform(X_test)
-
-
-            model = Sequential()
-            model.add(Dense(8, activation='relu', input_shape=(1,)))
-
-            for l in range (layers-2):
-                model.add(Dense(8, activation='relu'))
-
-            model.add(Dense(1, activation='sigmoid'))
-            model.compile(loss='binary_crossentropy',
-            optimizer='sgd',
-            metrics=['accuracy'])
-
-            model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
-
-
-            y_pred = model.predict(X_train)
-            score = model.evaluate(X_train, y_train,verbose=2)
-            print(score)
-
-            model.save('temp/')
-
-            progress('end')
 
 
         except:
@@ -120,9 +126,9 @@ def show(x, y, col_type):
     split.insert(END, '0.1')
     split.grid(row=2, column=2)
     
-    root.bind('<Return>', lambda:train(x, y, layers.get(), epoch.get(), split.get()))
+    root.bind('<Return>', lambda:model(x, y, layers.get(), epoch.get(), split.get()))
     
-    Button(root, text='Train Neural Network', command=lambda: train(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
+    Button(root, text='Train Neural Network', command=lambda: model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
 
 
 
@@ -137,4 +143,4 @@ def show(x, y, col_type):
 x, y, col_type = clean.up()
 # show(x, y, col_type)
 
-train(x, y, 3, 5, 0.01)
+model(x, y, 3, 5, 0.01)
