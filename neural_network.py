@@ -8,7 +8,7 @@ from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import clean, threading
+import clean, threading, time
 
 # mnist = tf.keras.datasets.mnist
 
@@ -16,7 +16,45 @@ import clean, threading
 # x_train, x_test = x_train / 255.0, x_test / 255.0
 
 
-def train(x, y, layers, epoch, split, acc):
+def inputs_ok(layers, epoch, split):
+    try: 
+        layers = int(layers)
+    except:
+        messagebox.showerror('Error', "No. of layers is not an integer.")
+        return False
+    try: 
+        epoch = int(epoch)
+    except:
+        messagebox.showerror('Error', "Epochs is not an integer.")
+        return False
+    try: 
+        split = float(split)
+    except:
+        messagebox.showerror('Error', "Split is not a decimal.")
+        return False
+    if layers < 3:
+        messagebox.showerror('Error', "No. of layers is too small.")
+        return False
+    if epoch < 1:
+        messagebox.showerror('Error', "Epochs is too small.")
+        return False
+    if split >= 1:
+        messagebox.showerror('Error', "Split is too big.")
+        return False
+    if split <= 0:
+        messagebox.showerror('Error', "Split is too small.")
+        return False
+    else:
+        return True
+
+
+
+done = False
+
+
+def train(x, y, layers, epoch, split):
+
+    global done
 
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
             
@@ -44,7 +82,8 @@ def train(x, y, layers, epoch, split, acc):
 
     model.save('temp/')
 
-    acc.set(score)
+    done = True
+    print('done is '+str(done))
 
 
 
@@ -52,43 +91,52 @@ def train(x, y, layers, epoch, split, acc):
 
 def model(x, y, layers, epoch, split):
 
-    if type(layers) == int and type(epoch) == int and type(split) == float and split < 1 and split > 0:
+    global done
 
-        try:
+    if inputs_ok(layers, epoch, split):
 
-            root = Tk()
-            # root.geometry('300x120')
-            root.title('Neural Network Model')
+        # try:
 
-            pb = ttk.Progressbar(
-                root,
-                orient='horizontal',
-                mode='indeterminate',
-                length=280
-            )
+        root = Tk()
+        # root.geometry('300x120')
+        root.title('Neural Network Model')
 
-            pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
-            pb.start()
+        pb = ttk.Progressbar(
+            root,
+            orient='horizontal',
+            mode='indeterminate',
+            length=280
+        )
 
-            acc = StringVar()
-            threading.Thread(target=train, args=(x, y, layers, epoch, split, acc)).start()
-            root.wait_variable(acc)
+        pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
+        pb.start()
 
-            pb.destroy()
-            root.insert(END, acc.get())
+        done = False
+
+        def check_done():
+            global done
+            if done:
+                pb.stop()
+                root.destroy()
+            else:
+                root.after(1000, check_done)
+
+        check_done()
+
+        threading.Thread(target=train, args=(x, y, layers, epoch, split)).start()
+        # root.wait_variable(done)
 
 
 
-            
+        root.mainloop()
 
+        # except:
+        #     messagebox.showerror('Error', "Parameters out of range.")
+        #     return
 
-        except:
-            messagebox.showerror('Error', "Parameters out of range.")
-            return
-
-    else:
-        messagebox.showerror('Error', "Input error.")
-        return
+    # else:
+    #     messagebox.showerror('Error', "Input error.")
+    #     return
 
 
 def show(x, y, col_type):
@@ -108,7 +156,7 @@ def show(x, y, col_type):
     # print(x)
     # print(y)
 
-    Label(root, text="No. of layers (integer > 3, default = 3)").grid(row=1, column=0)
+    Label(root, text="No. of layers (integer >= 3, default = 3)").grid(row=1, column=0)
 
     layers = Entry(root)
     layers.insert(END, '3')
@@ -128,7 +176,7 @@ def show(x, y, col_type):
     
     root.bind('<Return>', lambda:model(x, y, layers.get(), epoch.get(), split.get()))
     
-    Button(root, text='Train Neural Network', command=lambda: model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
+    Button(root, text='Train Neural Network', command=lambda:model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
 
 
 
@@ -141,6 +189,6 @@ def show(x, y, col_type):
 
 
 x, y, col_type = clean.up()
-# show(x, y, col_type)
+show(x, y, col_type)
 
-model(x, y, 3, 5, 0.01)
+# model(x, y, 3, 5, 0.01)
