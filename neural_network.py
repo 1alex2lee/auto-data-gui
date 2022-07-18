@@ -108,14 +108,23 @@ def model(x, y, layers, epoch, split):
             length=280
         )
 
-        pb.grid(column=0, row=0, columnspan=2, padx=10, pady=20)
+        def cancel():
+            global done
+            done = True
+            
+        Button(root, text='Cancel', command=cancel).grid(row=1, column=0, padx=5, pady=5)
+
+        pb.grid(column=0, row=0, padx=10, pady=20)
         pb.start()
 
         done = False
 
+        t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
+
         def check_done():
-            global done
+            global done, t
             if done:
+                # t.join()
                 pb.stop()
                 root.destroy()
             else:
@@ -123,7 +132,8 @@ def model(x, y, layers, epoch, split):
 
         check_done()
 
-        threading.Thread(target=train, args=(x, y, layers, epoch, split)).start()
+        
+        t.start()
         # root.wait_variable(done)
 
 
@@ -174,7 +184,7 @@ def show(x, y, col_type):
     split.insert(END, '0.1')
     split.grid(row=2, column=2)
     
-    root.bind('<Return>', lambda:model(x, y, layers.get(), epoch.get(), split.get()))
+    root.bind('<Return>', lambda event, l=layers.get(), e=epoch.get(), s=split.get(): model(x, y, l, e, s))
     
     Button(root, text='Train Neural Network', command=lambda:model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
 
@@ -189,6 +199,6 @@ def show(x, y, col_type):
 
 
 x, y, col_type = clean.up()
-show(x, y, col_type)
+# show(x, y, col_type)
 
-# model(x, y, 3, 5, 0.01)
+model(x, y, 3, 5, 0.01)
