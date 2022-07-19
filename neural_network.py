@@ -62,9 +62,10 @@ def train(x, y, layers, epoch, split):
     X_train = scaler.transform(X_train)
     # X_test = scaler.transform(X_test)
 
+    # print(X_train.shape)
 
     model = Sequential()
-    model.add(Dense(8, activation='relu', input_shape=(1,)))
+    model.add(Dense(8, activation='relu', input_shape=(X_train.shape[1],)))
 
     for l in range (layers-2):
         model.add(Dense(8, activation='relu'))
@@ -77,7 +78,7 @@ def train(x, y, layers, epoch, split):
     model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
 
     y_pred = model.predict(X_train)
-    score = model.evaluate(X_train, y_train,verbose=2)
+    score = model.evaluate(X_train, y_train,verbose=1)
     print(score)
 
     model.save('temp/')
@@ -112,7 +113,7 @@ def model(x, y, layers, epoch, split):
             global done
             done = True
             
-        Button(root, text='Cancel', command=cancel).grid(row=1, column=0, padx=5, pady=5)
+        Button(root, text='Cancel', command=lambda:[cancel, t.join()]).grid(row=1, column=0, padx=5, pady=5)
 
         pb.grid(column=0, row=0, padx=10, pady=20)
         pb.start()
@@ -122,9 +123,8 @@ def model(x, y, layers, epoch, split):
         t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
 
         def check_done():
-            global done, t
+            global done
             if done:
-                # t.join()
                 pb.stop()
                 root.destroy()
             else:
@@ -136,9 +136,10 @@ def model(x, y, layers, epoch, split):
         t.start()
         # root.wait_variable(done)
 
-
+        # t.join()
 
         root.mainloop()
+
 
         # except:
         #     messagebox.showerror('Error', "Parameters out of range.")
