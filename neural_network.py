@@ -8,12 +8,104 @@ from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import clean, threading, time
+import clean, threading, time, keras
 
 # mnist = tf.keras.datasets.mnist
 
 # (x_train, y_train), (x_test, y_test) = mnist.load_data()
 # x_train, x_test = x_train / 255.0, x_test / 255.0
+
+
+steps = 0
+
+
+class CustomCallback(keras.callbacks.Callback):
+
+    # def on_train_begin(self, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("Starting training; got log keys: {}".format(keys))
+    #     global steps
+    #     steps += 1
+
+    # def on_train_end(self, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("Stop training; got log keys: {}".format(keys))
+    #     global steps
+    #     steps += 1
+
+    # def on_epoch_begin(self, epoch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("Start epoch {} of training; got log keys: {}".format(epoch, keys))
+    #     global steps
+    #     steps += 1
+
+    def on_epoch_end(self, epoch, logs=None):
+        keys = list(logs.keys())
+        # print("End epoch {} of training; got log keys: {}".format(epoch, keys))
+        global steps
+        steps += 1
+
+    # def on_test_begin(self, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("Start testing; got log keys: {}".format(keys))
+    #     global steps
+    #     steps += 1
+
+    def on_test_end(self, logs=None):
+        keys = list(logs.keys())
+        # print("Stop testing; got log keys: {}".format(keys))
+        global steps
+        steps += 1
+
+    # def on_predict_begin(self, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("Start predicting; got log keys: {}".format(keys))
+    #     global steps
+    #     steps += 1
+
+    def on_predict_end(self, logs=None):
+        keys = list(logs.keys())
+        # print("Stop predicting; got log keys: {}".format(keys))
+        global steps
+        steps += 1
+
+    # def on_train_batch_begin(self, batch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("...Training: start of batch {}; got log keys: {}".format(batch, keys))
+    #     global steps
+    #     steps += 1
+
+    def on_train_batch_end(self, batch, logs=None):
+        keys = list(logs.keys())
+        # print("...Training: end of batch {}; got log keys: {}".format(batch, keys))
+        global steps
+        steps += 1
+
+    # def on_test_batch_begin(self, batch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("...Evaluating: start of batch {}; got log keys: {}".format(batch, keys))
+    #     global steps
+    #     steps += 1
+
+    # def on_test_batch_end(self, batch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("...Evaluating: end of batch {}; got log keys: {}".format(batch, keys))
+    #     global steps
+    #     steps += 1
+
+    # def on_predict_batch_begin(self, batch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("...Predicting: start of batch {}; got log keys: {}".format(batch, keys))
+    #     global steps
+    #     steps += 1
+
+    # def on_predict_batch_end(self, batch, logs=None):
+    #     keys = list(logs.keys())
+    #     # print("...Predicting: end of batch {}; got log keys: {}".format(batch, keys))
+    #     global steps
+    #     steps += 1
+
+
 
 
 def inputs_ok(layers, epoch, split):
@@ -54,7 +146,7 @@ done = False
 
 def train(x, y, layers, epoch, split):
 
-    global done
+    global done, steps
 
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
             
@@ -75,16 +167,17 @@ def train(x, y, layers, epoch, split):
     optimizer='sgd',
     metrics=['accuracy'])
 
-    model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1)
+    model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1, callbacks=[CustomCallback()])
 
-    y_pred = model.predict(X_train)
-    score = model.evaluate(X_train, y_train,verbose=1)
+    y_pred = model.predict(X_train, callbacks=[CustomCallback()])
+    score = model.evaluate(X_train, y_train, verbose=1, callbacks=[CustomCallback()])
     print(score)
 
     model.save('temp/')
 
     done = True
     print('done is '+str(done))
+    print('there are {} steps'.format(steps))
 
 
 
@@ -202,4 +295,4 @@ def show(x, y, col_type):
 x, y, col_type = clean.up()
 # show(x, y, col_type)
 
-model(x, y, 3, 5, 0.01)
+model(x, y, 3, 4, 0.01)
