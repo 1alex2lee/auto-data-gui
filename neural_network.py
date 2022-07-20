@@ -16,176 +16,120 @@ import clean, threading, time, keras
 # x_train, x_test = x_train / 255.0, x_test / 255.0
 
 
-steps = 0
-
-
-class CustomCallback(keras.callbacks.Callback):
-
-    # def on_train_begin(self, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("Starting training; got log keys: {}".format(keys))
-    #     global steps
-    #     steps += 1
-
-    # def on_train_end(self, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("Stop training; got log keys: {}".format(keys))
-    #     global steps
-    #     steps += 1
-
-    # def on_epoch_begin(self, epoch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("Start epoch {} of training; got log keys: {}".format(epoch, keys))
-    #     global steps
-    #     steps += 1
-
-    def on_epoch_end(self, epoch, logs=None):
-        keys = list(logs.keys())
-        # print("End epoch {} of training; got log keys: {}".format(epoch, keys))
-        global steps
-        steps += 1
-
-    # def on_test_begin(self, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("Start testing; got log keys: {}".format(keys))
-    #     global steps
-    #     steps += 1
-
-    def on_test_end(self, logs=None):
-        keys = list(logs.keys())
-        # print("Stop testing; got log keys: {}".format(keys))
-        global steps
-        steps += 1
-
-    # def on_predict_begin(self, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("Start predicting; got log keys: {}".format(keys))
-    #     global steps
-    #     steps += 1
-
-    def on_predict_end(self, logs=None):
-        keys = list(logs.keys())
-        # print("Stop predicting; got log keys: {}".format(keys))
-        global steps
-        steps += 1
-
-    # def on_train_batch_begin(self, batch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("...Training: start of batch {}; got log keys: {}".format(batch, keys))
-    #     global steps
-    #     steps += 1
-
-    def on_train_batch_end(self, batch, logs=None):
-        keys = list(logs.keys())
-        # print("...Training: end of batch {}; got log keys: {}".format(batch, keys))
-        global steps
-        steps += 1
-
-    # def on_test_batch_begin(self, batch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("...Evaluating: start of batch {}; got log keys: {}".format(batch, keys))
-    #     global steps
-    #     steps += 1
-
-    # def on_test_batch_end(self, batch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("...Evaluating: end of batch {}; got log keys: {}".format(batch, keys))
-    #     global steps
-    #     steps += 1
-
-    # def on_predict_batch_begin(self, batch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("...Predicting: start of batch {}; got log keys: {}".format(batch, keys))
-    #     global steps
-    #     steps += 1
-
-    # def on_predict_batch_end(self, batch, logs=None):
-    #     keys = list(logs.keys())
-    #     # print("...Predicting: end of batch {}; got log keys: {}".format(batch, keys))
-    #     global steps
-    #     steps += 1
-
-
-
-
-def inputs_ok(layers, epoch, split):
-    try: 
-        layers = int(layers)
-    except:
-        messagebox.showerror('Error', "No. of layers is not an integer.")
-        return False
-    try: 
-        epoch = int(epoch)
-    except:
-        messagebox.showerror('Error', "Epochs is not an integer.")
-        return False
-    try: 
-        split = float(split)
-    except:
-        messagebox.showerror('Error', "Split is not a decimal.")
-        return False
-    if layers < 3:
-        messagebox.showerror('Error', "No. of layers is too small.")
-        return False
-    if epoch < 1:
-        messagebox.showerror('Error', "Epochs is too small.")
-        return False
-    if split >= 1:
-        messagebox.showerror('Error', "Split is too big.")
-        return False
-    if split <= 0:
-        messagebox.showerror('Error', "Split is too small.")
-        return False
-    else:
-        return True
-
-
-
-done = False
-
-
-def train(x, y, layers, epoch, split):
-
-    global done, steps
-
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
-            
-    scaler = StandardScaler().fit(X_train)
-    X_train = scaler.transform(X_train)
-    # X_test = scaler.transform(X_test)
-
-    # print(X_train.shape)
-
-    model = Sequential()
-    model.add(Dense(8, activation='relu', input_shape=(X_train.shape[1],)))
-
-    for l in range (layers-2):
-        model.add(Dense(8, activation='relu'))
-
-    model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy',
-    optimizer='sgd',
-    metrics=['accuracy'])
-
-    model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1, callbacks=[CustomCallback()])
-
-    y_pred = model.predict(X_train, callbacks=[CustomCallback()])
-    score = model.evaluate(X_train, y_train, verbose=1, callbacks=[CustomCallback()])
-    print(score)
-
-    model.save('temp/')
-
-    done = True
-    print('done is '+str(done))
-    print('there are {} steps'.format(steps))
-
-
-
-
-
 def model(x, y, layers, epoch, split):
 
-    global done
+    total_steps = 0
+    current_step = 0
+    done = False
+
+    class CustomCallback(keras.callbacks.Callback):
+
+        def on_epoch_end(self, epoch, logs=None):
+            keys = list(logs.keys())
+            # print("End epoch {} of training; got log keys: {}".format(epoch, keys))
+            global current_step, total_steps
+            current_step += 1
+            pb['value'] += 1/total_steps
+
+        def on_test_end(self, logs=None):
+            keys = list(logs.keys())
+            # print("Stop testing; got log keys: {}".format(keys))
+            global current_step, total_steps
+            current_step += 1
+            pb['value'] += 1/total_steps
+
+        def on_predict_end(self, logs=None):
+            keys = list(logs.keys())
+            # print("Stop predicting; got log keys: {}".format(keys))
+            global current_step, total_steps
+            current_step += 1
+            pb['value'] += 1/total_steps
+
+        def on_train_batch_end(self, batch, logs=None):
+            keys = list(logs.keys())
+            # print("...Training: end of batch {}; got log keys: {}".format(batch, keys))
+            global current_step, total_steps
+            current_step += 1
+            pb['value'] += 1/total_steps
+
+
+
+
+    def inputs_ok(layers, epoch, split):
+        try: 
+            layers = int(layers)
+        except:
+            messagebox.showerror('Error', "No. of layers is not an integer.")
+            return False
+        try: 
+            epoch = int(epoch)
+        except:
+            messagebox.showerror('Error', "Epochs is not an integer.")
+            return False
+        try: 
+            split = float(split)
+        except:
+            messagebox.showerror('Error', "Split is not a decimal.")
+            return False
+        if layers < 3:
+            messagebox.showerror('Error', "No. of layers is too small.")
+            return False
+        if epoch < 1:
+            messagebox.showerror('Error', "Epochs is too small.")
+            return False
+        if split >= 1:
+            messagebox.showerror('Error', "Split is too big.")
+            return False
+        if split <= 0:
+            messagebox.showerror('Error', "Split is too small.")
+            return False
+        else:
+            return True
+
+
+
+    
+
+
+    def train(x, y, layers, epoch, split):
+
+        global done, total_steps, pb
+
+        X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
+                
+        scaler = StandardScaler().fit(X_train)
+        X_train = scaler.transform(X_train)
+        # X_test = scaler.transform(X_test)
+
+        # print(X_train.shape)
+
+        model = Sequential()
+        model.add(Dense(8, activation='relu', input_shape=(X_train.shape[1],)))
+
+        total_steps = epoch*X_train.shape[0] + 2
+
+        for l in range (layers-2):
+            model.add(Dense(8, activation='relu'))
+
+        model.add(Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy',
+        optimizer='sgd',
+        metrics=['accuracy'])
+
+        model.fit(X_train, y_train,epochs=epoch, batch_size=1, verbose=1, callbacks=[CustomCallback()])
+
+        y_pred = model.predict(X_train, callbacks=[CustomCallback()])
+        score = model.evaluate(X_train, y_train, verbose=1, callbacks=[CustomCallback()])
+        print(score)
+
+        model.save('temp/')
+
+        done = True
+        print('done is '+str(done))
+        print('there are {} steps'.format(steps))
+
+
+
 
     if inputs_ok(layers, epoch, split):
 
@@ -198,12 +142,12 @@ def model(x, y, layers, epoch, split):
         pb = ttk.Progressbar(
             root,
             orient='horizontal',
-            mode='indeterminate',
+            mode='determinate',
             length=280
         )
 
         def cancel():
-            global done
+            # global done
             done = True
             
         Button(root, text='Cancel', command=lambda:[cancel, t.join()]).grid(row=1, column=0, padx=5, pady=5)
@@ -211,12 +155,10 @@ def model(x, y, layers, epoch, split):
         pb.grid(column=0, row=0, padx=10, pady=20)
         pb.start()
 
-        done = False
-
         t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
 
         def check_done():
-            global done
+            # global done
             if done:
                 pb.stop()
                 root.destroy()
