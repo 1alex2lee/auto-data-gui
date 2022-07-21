@@ -8,7 +8,7 @@ from keras.layers import Dense
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import clean, threading, time, keras
+import clean, threading, time, keras, concurrent.futures
 
 # mnist = tf.keras.datasets.mnist
 
@@ -16,41 +16,39 @@ import clean, threading, time, keras
 # x_train, x_test = x_train / 255.0, x_test / 255.0
 
 
+
+
 def model(x, y, layers, epoch, split):
 
-    total_steps = 0
-    current_step = 0
     done = False
 
     class CustomCallback(keras.callbacks.Callback):
 
         def on_epoch_end(self, epoch, logs=None):
-            keys = list(logs.keys())
-            # print("End epoch {} of training; got log keys: {}".format(epoch, keys))
             global current_step, total_steps
             current_step += 1
-            pb['value'] += 1/total_steps
+            pb['value'] = 100*current_step/total_steps
+            print(pb['value'])
 
         def on_test_end(self, logs=None):
-            keys = list(logs.keys())
-            # print("Stop testing; got log keys: {}".format(keys))
             global current_step, total_steps
+            # current_step += 1
             current_step += 1
-            pb['value'] += 1/total_steps
+            pb['value'] = 100*current_step/total_steps
+            print(pb['value'])
 
         def on_predict_end(self, logs=None):
-            keys = list(logs.keys())
-            # print("Stop predicting; got log keys: {}".format(keys))
             global current_step, total_steps
+            # current_step += 1
             current_step += 1
-            pb['value'] += 1/total_steps
+            pb['value'] = 100*current_step/total_steps
+            print(pb['value'])
 
         def on_train_batch_end(self, batch, logs=None):
-            keys = list(logs.keys())
-            # print("...Training: end of batch {}; got log keys: {}".format(batch, keys))
             global current_step, total_steps
             current_step += 1
-            pb['value'] += 1/total_steps
+            pb['value'] = 100*current_step/total_steps
+            print(pb['value'])
 
 
 
@@ -93,7 +91,7 @@ def model(x, y, layers, epoch, split):
 
     def train(x, y, layers, epoch, split):
 
-        global done, total_steps, pb
+        global done, total_steps, pb, current_step
 
         X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
                 
@@ -106,7 +104,9 @@ def model(x, y, layers, epoch, split):
         model = Sequential()
         model.add(Dense(8, activation='relu', input_shape=(X_train.shape[1],)))
 
+        current_step = 0
         total_steps = epoch*X_train.shape[0] + 2
+        done = False
 
         for l in range (layers-2):
             model.add(Dense(8, activation='relu'))
@@ -126,7 +126,9 @@ def model(x, y, layers, epoch, split):
 
         done = True
         print('done is '+str(done))
-        print('there are {} steps'.format(steps))
+        print('there are {} steps'.format(total_steps))
+
+        return True
 
 
 
@@ -137,42 +139,54 @@ def model(x, y, layers, epoch, split):
 
         root = Tk()
         # root.geometry('300x120')
-        root.title('Neural Network Model')
+        root.title('Training Neural Network Model')
 
         pb = ttk.Progressbar(
             root,
             orient='horizontal',
             mode='determinate',
-            length=280
+            length=380
         )
 
         def cancel():
-            # global done
+            global done
             done = True
+            pb.stop()
+            root.destroy()
+
             
-        Button(root, text='Cancel', command=lambda:[cancel, t.join()]).grid(row=1, column=0, padx=5, pady=5)
+        Button(root, text='Cancel', command=lambda:[t.join(), cancel]).grid(row=1, column=0, padx=5, pady=5)
 
         pb.grid(column=0, row=0, padx=10, pady=20)
         pb.start()
 
-        t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
 
-        def check_done():
-            # global done
-            if done:
-                pb.stop()
-                root.destroy()
-            else:
-                root.after(1000, check_done)
+        # t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
 
-        check_done()
+        # def check_done():
+        #     # global done
+        #     if done:
+        #         pb.stop()
+        #         root.destroy()
+        #     else:
+        #         root.after(1, check_done)
 
-        
-        t.start()
+        # check_done()
+
+        # t.start()
+
+
+        executor = concurrent.futures.ThreadPoolExecutor()
+        future = executor.submit(train, x, y, layers, epoch, split)
+        while future.result():
+            pb.stop()
+            root.destroy()
+
+
         # root.wait_variable(done)
 
         # t.join()
-
+        # print('the progress bar is at {}'.format(pb['value']))
         root.mainloop()
 
 
@@ -237,4 +251,4 @@ def show(x, y, col_type):
 x, y, col_type = clean.up()
 # show(x, y, col_type)
 
-model(x, y, 3, 4, 0.01)
+model(x, y, 3, 5, 0.01)
