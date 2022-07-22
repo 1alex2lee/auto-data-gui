@@ -1,19 +1,49 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import tensorflow as tf
 from keras.models import Sequential
-import pandas as pd
 from keras.layers import Dense
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import clean, threading, time, keras, concurrent.futures
+import clean, threading, keras
 
 # mnist = tf.keras.datasets.mnist
 
 # (x_train, y_train), (x_test, y_test) = mnist.load_data()
 # x_train, x_test = x_train / 255.0, x_test / 255.0
+
+
+
+def predict(x):
+
+    predict_window = Tk()
+    predict_window.title('Predict Using Neural Network Model')
+
+    model = keras.models.load_model('temp/')
+
+    def predict_y(event=None):
+        x_pred = []
+        for c in range (cols_no):
+            print('{} is {}'.format(x_cols[c], x_cols_entry[c].get()))
+            x_pred.append(float(x_cols_entry[c].get()))
+        
+        Label(predict_window, text='Predicted y value is {}'.format(model.predict(x_pred))).grid(row=cols_no+2, column=0, columnspan=2, padx=5, pady=5)
+
+    # print(x.columns[0])
+
+    x_cols = x.columns
+    cols_no = len(x_cols)
+    x_cols_entry = []
+
+    for c in range (cols_no):
+        Label(predict_window, text=x_cols[c]).grid(row=c, column=0, padx=5, pady=5)
+        x_cols_entry.append(Entry(predict_window))
+        x_cols_entry[c].grid(row=c, column=1, padx=5, pady=5)
+
+    Button(predict_window, text='Predict', command=predict_y).grid(row=cols_no+1, column=0, columnspan=2, padx=5, pady=5)
+    predict_window.bind('<Return>', predict_y)
+
+    predict_window.mainloop()
 
 
 
@@ -28,27 +58,25 @@ def model(x, y, layers, epoch, split):
             global current_step, total_steps
             current_step += 1
             pb['value'] = 100*current_step/total_steps
-            print(pb['value'])
+            # print(pb['value'])
 
         def on_test_end(self, logs=None):
             global current_step, total_steps
-            # current_step += 1
             current_step += 1
             pb['value'] = 100*current_step/total_steps
-            print(pb['value'])
+            # print(pb['value'])
 
         def on_predict_end(self, logs=None):
             global current_step, total_steps
-            # current_step += 1
             current_step += 1
             pb['value'] = 100*current_step/total_steps
-            print(pb['value'])
+            # print(pb['value'])
 
         def on_train_batch_end(self, batch, logs=None):
             global current_step, total_steps
             current_step += 1
             pb['value'] = 100*current_step/total_steps
-            print(pb['value'])
+            # print(pb['value'])
 
 
 
@@ -85,13 +113,14 @@ def model(x, y, layers, epoch, split):
             return True
 
 
-
     
 
 
-    def train(x, y, layers, epoch, split):
+    def train(x, y, layers, epoch, split, event=None):
 
-        global done, total_steps, pb, current_step
+        global total_steps, current_step
+
+        pb.start()
 
         X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=split, random_state=42)
                 
@@ -105,7 +134,7 @@ def model(x, y, layers, epoch, split):
         model.add(Dense(8, activation='relu', input_shape=(X_train.shape[1],)))
 
         current_step = 0
-        total_steps = epoch*X_train.shape[0] + 2
+        total_steps = epoch*X_train.shape[0] + epoch + 2
         done = False
 
         for l in range (layers-2):
@@ -126,9 +155,15 @@ def model(x, y, layers, epoch, split):
 
         done = True
         print('done is '+str(done))
-        print('there are {} steps'.format(total_steps))
+        print('current at {} of {} steps'.format(current_step, total_steps))
 
-        return True
+        pb.stop()
+        train_window.quit()
+        # train_window.destroy()
+
+        predict(x)
+
+        # return True
 
 
 
@@ -137,31 +172,34 @@ def model(x, y, layers, epoch, split):
 
         # try:
 
-        root = Tk()
+        train_window = Tk()
         # root.geometry('300x120')
-        root.title('Training Neural Network Model')
+        train_window.title('Training Neural Network Model')
 
         pb = ttk.Progressbar(
-            root,
+            train_window,
             orient='horizontal',
             mode='determinate',
             length=380
         )
 
         def cancel():
-            global done
-            done = True
-            pb.stop()
-            root.destroy()
-
+            # global done
+            # done = True
+            # pb['value']=100
+            # t.join()
+            train_window.destroy()
             
-        Button(root, text='Cancel', command=lambda:[t.join(), cancel]).grid(row=1, column=0, padx=5, pady=5)
+        Button(train_window, text='Cancel', command=cancel).grid(row=1, column=0, padx=5, pady=5)
 
         pb.grid(column=0, row=0, padx=10, pady=20)
         pb.start()
 
+        layers = int(layers)
+        epoch = int(epoch)
+        split = float(split)
 
-        # t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
+        t = threading.Thread(target=train, args=(x, y, layers, epoch, split))
 
         # def check_done():
         #     # global done
@@ -173,21 +211,22 @@ def model(x, y, layers, epoch, split):
 
         # check_done()
 
-        # t.start()
+        t.start()
 
 
-        executor = concurrent.futures.ThreadPoolExecutor()
-        future = executor.submit(train, x, y, layers, epoch, split)
-        while future.result():
-            pb.stop()
-            root.destroy()
+        # executor = concurrent.futures.ThreadPoolExecutor()
+        # future = executor.submit(train, x, y, layers, epoch, split)
+        # result = future.result()
+        # while result:
+        #     pb.stop()
+        #     root.destroy()
 
 
         # root.wait_variable(done)
 
         # t.join()
         # print('the progress bar is at {}'.format(pb['value']))
-        root.mainloop()
+        train_window.mainloop()
 
 
         # except:
@@ -201,10 +240,10 @@ def model(x, y, layers, epoch, split):
 
 def show(x, y, col_type):
 
-    root = Tk()
-    root.title('Deep Neural Network')
+    show_window = Tk()
+    show_window.title('Deep Neural Network')
 
-    Label(root, 
+    Label(show_window, 
         text="A neural network is trained with the selected data and its accuracy shown."
         ).grid(row=0, column=0, columnspan=3)
 
@@ -216,27 +255,27 @@ def show(x, y, col_type):
     # print(x)
     # print(y)
 
-    Label(root, text="No. of layers (integer >= 3, default = 3)").grid(row=1, column=0)
+    Label(show_window, text="No. of layers (integer >= 3, default = 3)").grid(row=1, column=0)
 
-    layers = Entry(root)
+    layers = Entry(show_window)
     layers.insert(END, '3')
     layers.grid(row=2, column=0)
 
-    Label(root, text="Epochs (integer > 1, default = 5)").grid(row=1, column=1)
+    Label(show_window, text="Epochs (integer > 1, default = 5)").grid(row=1, column=1)
 
-    epoch = Entry(root)
+    epoch = Entry(show_window)
     epoch.insert(END, '5')
     epoch.grid(row=2, column=1)
 
-    Label(root, text="Test/train split (float 0 < 1, default = 0.1)").grid(row=1, column=2)
+    Label(show_window, text="Test/train split (float 0 < 1, default = 0.01)").grid(row=1, column=2)
 
-    split = Entry(root)
-    split.insert(END, '0.1')
+    split = Entry(show_window)
+    split.insert(END, '0.01')
     split.grid(row=2, column=2)
     
-    root.bind('<Return>', lambda event, l=layers.get(), e=epoch.get(), s=split.get(): model(x, y, l, e, s))
+    show_window.bind('<Return>', lambda event, l=layers.get(), e=epoch.get(), s=split.get(): model(x, y, l, e, s))
     
-    Button(root, text='Train Neural Network', command=lambda:model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
+    Button(show_window, text='Train Neural Network', command=lambda:model(x, y, layers.get(), epoch.get(), split.get())).grid(row=3, column=0, columnspan=3)
 
 
 
@@ -245,10 +284,10 @@ def show(x, y, col_type):
     #     text="Neural Network score is "+str(score)
     #     ).pack()
 
-    root.mainloop()
+    show_window.mainloop()
 
 
 x, y, col_type = clean.up()
-# show(x, y, col_type)
-
-model(x, y, 3, 5, 0.01)
+show(x, y, col_type)
+# model(x, y, 3, 5, 0.01)
+# predict(x)
