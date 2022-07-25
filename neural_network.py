@@ -6,6 +6,7 @@ from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import clean, threading, keras
+import numpy as np
 
 # mnist = tf.keras.datasets.mnist
 
@@ -27,6 +28,8 @@ def predict(x):
             print('{} is {}'.format(x_cols[c], x_cols_entry[c].get()))
             x_pred.append(float(x_cols_entry[c].get()))
         
+        x_pred = np.array(x_pred).reshape(1,-1)
+        print(x_pred)
         Label(predict_window, text='Predicted y value is {}'.format(model.predict(x_pred))).grid(row=cols_no+2, column=0, columnspan=2, padx=5, pady=5)
 
     # print(x.columns[0])
@@ -288,6 +291,6 @@ def show(x, y, col_type):
 
 
 x, y, col_type = clean.up()
-show(x, y, col_type)
+# show(x, y, col_type)
 # model(x, y, 3, 5, 0.01)
-# predict(x)
+predict(x)
